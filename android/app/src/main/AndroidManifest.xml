@@ -1,0 +1,72 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.translation_app">
+
+    <!-- ✅ REQUIRED PERMISSIONS -->
+
+    <!-- For file access -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
+    <!-- Android 13+ media permissions -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
+    <!-- ✅ CAMERA PERMISSION -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- ✅ FILE PICKER / IMAGE CAPTURE QUERY SUPPORT -->
+    <queries>
+        <!-- For PROCESS_TEXT (optional) -->
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT" />
+            <data android:mimeType="text/plain" />
+        </intent>
+
+        <!-- For image capture -->
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+
+        <!-- For file/image access -->
+        <intent>
+            <action android:name="android.intent.action.GET_CONTENT" />
+        </intent>
+    </queries>
+
+    <application
+        android:enableOnBackInvokedCallback="true"
+        android:label="translation_app"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher"
+        android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="true">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+
+            <meta-data
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+    </application>
+
+</manifest>
