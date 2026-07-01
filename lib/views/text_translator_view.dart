@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'translation_service.dart';
+import 'package:translation_app/controllers/text_translation_controller.dart';
+
 
 class TextTranslator extends StatefulWidget {
   const TextTranslator({super.key});
@@ -10,11 +11,12 @@ class TextTranslator extends StatefulWidget {
 
 class _TextTranslatorState extends State<TextTranslator> {
 
-  final TextEditingController _textController = TextEditingController();
+  final TextEditingController textController = TextEditingController();
+  final  controller = TextTranslationController();
 
-  String? _selectedFromLanguage = 'en';
-  String? _selectedToLanguage ='es';
-  String? _translatedText;
+  // String? _selectedFromLanguage = 'en';
+  // String? _selectedToLanguage ='es';
+  // String? _translatedText;
 
 
   final Map<String, String> _languages = {
@@ -28,19 +30,19 @@ class _TextTranslatorState extends State<TextTranslator> {
     'ar': 'Arabic',
   };
 
-  Future<void> _translateText() async {
-    if (_textController.text.isEmpty) return;
-
-    final translated = await TranslationService.translateText(
-      text: _textController.text,
-      from: _selectedFromLanguage!,
-      to: _selectedToLanguage!,
-    );
-
-    setState(() {
-      _translatedText = translated;
-    });
-  }
+  // Future<void> _translateText() async {
+  //   if (_textController.text.isEmpty) return;
+  //
+  //   final translated = await TranslationService.translateText(
+  //     text: _textController.text,
+  //     from: _selectedFromLanguage!,
+  //     to: _selectedToLanguage!,
+  //   );
+  //
+  //   setState(() {
+  //     _translatedText = translated;
+  //   });
+  // }
 
 
   @override
@@ -68,7 +70,7 @@ class _TextTranslatorState extends State<TextTranslator> {
               children: [
                 Expanded(
                   child: DropdownButtonFormField<String>(
-                    value: _selectedFromLanguage,
+                    value:controller.selectedFromLanguage,
                     items: _languages.entries.map((entry) {
                       return DropdownMenuItem<String>(
                         value: entry.key,
@@ -77,9 +79,10 @@ class _TextTranslatorState extends State<TextTranslator> {
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
-                        _selectedFromLanguage = value;
+                       controller.selectedFromLanguage = value;
                       });
                     },
+
                     decoration: InputDecoration(
                       labelText: 'From Language',
                       border: OutlineInputBorder(),
@@ -87,9 +90,11 @@ class _TextTranslatorState extends State<TextTranslator> {
                   ),
                 ),
                 SizedBox(width: 16),
+
                 Expanded(
+
                   child: DropdownButtonFormField<String>(
-                    value: _selectedToLanguage,
+                    value: controller.selectedToLanguage,
                     items: _languages.entries.map((entry) {
                       return DropdownMenuItem<String>(
                         value: entry.key,
@@ -98,7 +103,7 @@ class _TextTranslatorState extends State<TextTranslator> {
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
-                        _selectedToLanguage = value;
+                        controller.selectedToLanguage = value;
                       });
                     },
                     decoration: InputDecoration(
@@ -111,7 +116,7 @@ class _TextTranslatorState extends State<TextTranslator> {
             ),SizedBox(height: 16),
 
             TextField(
-              controller: _textController,
+              controller: textController,
               maxLines: 4,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
@@ -121,15 +126,24 @@ class _TextTranslatorState extends State<TextTranslator> {
 
 
             ElevatedButton(
-              onPressed: _translateText,
+              onPressed: () async {
+                await  controller.translateText(textController.text);
+                setState(() {
+
+                });
+              },
+
+
               child: Text('Translate'),
+
+
             ),
-            if (_translatedText != null)
+            if (controller.translatedText != null)
               Padding(
                 padding: const EdgeInsets.only(top: 20),
                 child: Container(
                   child: Text(
-                    _translatedText!,
+                   controller.translatedText!,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500,color: Colors.black),
                   ),
                 ),

@@ -31,6 +31,7 @@ class LanguageTranslatorHome extends StatelessWidget {
           elevation: 1,
           bottom: TabBar(
             tabs: myTabs,
+
             indicatorColor: Colors.blue,
             labelColor: Colors.blue,
             unselectedLabelColor: Colors.black54,
@@ -38,13 +39,14 @@ class LanguageTranslatorHome extends StatelessWidget {
           ),
         ),
         body: TabBarView(
-          children: [
-           HomePage(),
-            AiToolsPage(),
-            MorePage(),
-          ],
+            children: [
+             HomePage(),
+              AiToolsPage(),
+              MorePage(),
+            ],
+          ),
         ),
-      ),
+
     );
   }
 }

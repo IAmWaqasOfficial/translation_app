@@ -1,9 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
-import 'translation_service.dart'; // your API wrapper
+import 'controllers/document_translator_controller.dart';
+
 
 class Documenttranslator extends StatefulWidget {
   const Documenttranslator({super.key});
@@ -13,13 +11,19 @@ class Documenttranslator extends StatefulWidget {
 }
 
 class _DocumenttranslatorState extends State<Documenttranslator> {
-  String? _pickedFileName;
-  String? _extractedText;
-  String? _translatedText;
+
+
+
+  final controller=documentTranslatorController();
+
+
+
+
+
+
+
   bool _isLoading = false;
 
-  String? _selectedFromLang = 'auto';
-  String? _selectedToLang = 'en';
 
   final Map<String, String> _languages = {
     'auto': 'Auto Detect',
@@ -38,93 +42,85 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
     'pt': 'Portuguese',
   };
 
-  Future<bool> _requestPermission() async {
-    if (Platform.isAndroid) {
-
-      var storageStatus = await Permission.storage.status;
-
-      if (storageStatus.isGranted) return true;
-
-      // Try requesting storage permission
-      storageStatus = await Permission.storage.request();
-      if (storageStatus.isGranted) return true;
-
-      // On Android 11+ (API 30+), also try manage external storage
-      var manageStorageStatus = await Permission.manageExternalStorage.status;
-      if (manageStorageStatus.isGranted) return true;
-
-      manageStorageStatus = await Permission.manageExternalStorage.request();
-      return manageStorageStatus.isGranted;
-    } else if (Platform.isIOS) {
-      // iOS: no extra permission required for file_picker
-      return true;
-    }
-
-    return false;
-  }
+  // Future<bool> _requestPermission() async {
+  //   if (Platform.isAndroid) {
+  //     var storageStatus = await Permission.storage.status;
+  //     if (storageStatus.isGranted) return true;
+  //     storageStatus = await Permission.storage.request();
+  //     if (storageStatus.isGranted) return true;
+  //     var manageStorageStatus = await Permission.manageExternalStorage.status;
+  //     if (manageStorageStatus.isGranted) return true;
+  //     manageStorageStatus = await Permission.manageExternalStorage.request();
+  //     return manageStorageStatus.isGranted;
+  //   } else if (Platform.isIOS) {
+  //     return true;
+  //   }
+  //
+  //   return false;
+  // }
 
 
-  Future<String> _extractTextFromFile(File file) async {
-    final bytes = await file.readAsBytes();
-    final PdfDocument document = PdfDocument(inputBytes: bytes);
-    final String text = PdfTextExtractor(document).extractText();
-    document.dispose();
-    return text;
-  }
+  // Future<String> _extractTextFromFile(File file) async {
+  //   final bytes = await file.readAsBytes();
+  //   final PdfDocument document = PdfDocument(inputBytes: bytes);
+  //   final String text = PdfTextExtractor(document).extractText();
+  //   document.dispose();
+  //   return text;
+  // }
 
-  Future<void> _pickDocument() async {
-    bool permissionGranted = await _requestPermission();
-    if (!permissionGranted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Storage permission is required to pick files.')),
-      );
-      return;
-    }
-
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
-    );
-
-    if (result != null && result.files.isNotEmpty) {
-      final file = File(result.files.single.path!);
-
-      setState(() {
-        _pickedFileName = result.files.single.name;
-        _isLoading = true;
-        _translatedText = null;
-        _extractedText = null;
-      });
-
-      try {
-        final extracted = await _extractTextFromFile(file);
-
-        setState(() {
-          _extractedText = extracted; // ✅ store extracted text
-        });
-
-        final translated = await TranslationService.translateText(
-          text: extracted,
-          from: _selectedFromLang == 'auto' ? null : _selectedFromLang,
-          to: _selectedToLang!,
-        );
-
-        setState(() {
-          _translatedText = translated;
-        });
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      } finally {
-        setState(() => _isLoading = false);
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No file selected.')),
-      );
-    }
-  }
+  // Future<void> _pickDocument() async {
+  //   bool permissionGranted = await _requestPermission();
+  //   if (!permissionGranted) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Storage permission is required to pick files.')),
+  //     );
+  //     return;
+  //   }
+  //
+  //   FilePickerResult? result = await FilePicker.platform.pickFiles(
+  //     type: FileType.custom,
+  //     allowedExtensions: ['pdf'],
+  //   );
+  //
+  //   if (result != null && result.files.isNotEmpty) {
+  //     final file = File(result.files.single.path!);
+  //
+  //     setState(() {
+  //       _pickedFileName = result.files.single.name;
+  //       _isLoading = true;
+  //       _translatedText = null;
+  //       _extractedText = null;
+  //     });
+  //
+  //     try {
+  //       final extracted = await _extractTextFromFile(file);
+  //
+  //       setState(() {
+  //         _extractedText = extracted;
+  //       });
+  //
+  //       final translated = await TranslationService.translateText(
+  //         text: extracted,
+  //         from: _selectedFromLang == 'auto' ? null : _selectedFromLang,
+  //         to: _selectedToLang!,
+  //       );
+  //
+  //       setState(() {
+  //         _translatedText = translated;
+  //       });
+  //     } catch (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Error: $e')),
+  //       );
+  //     } finally {
+  //       setState(() => _isLoading = false);
+  //     }
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('No file selected.')),
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -148,12 +144,12 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
             ),
             const SizedBox(height: 20),
 
-            /// Language dropdowns
+
             Row(
               children: [
                 Expanded(
                   child: DropdownButtonFormField<String>(
-                    value: _selectedFromLang,
+                    value: controller.selectedFromLang,
                     decoration: const InputDecoration(
                       labelText: 'From',
                       border: OutlineInputBorder(),
@@ -165,13 +161,13 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
                       );
                     }).toList(),
                     onChanged: (value) =>
-                        setState(() => _selectedFromLang = value),
+                        setState(() => controller.selectedFromLang = value),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: DropdownButtonFormField<String>(
-                    value: _selectedToLang,
+                    value: controller.selectedToLang,
                     decoration: const InputDecoration(
                       labelText: 'To',
                       border: OutlineInputBorder(),
@@ -185,7 +181,7 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
                       );
                     }).toList(),
                     onChanged: (value) =>
-                        setState(() => _selectedToLang = value),
+                        setState(() => controller.selectedToLang = value),
                   ),
                 ),
               ],
@@ -194,7 +190,9 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
             const SizedBox(height: 20),
 
             ElevatedButton(
-              onPressed: _pickDocument,
+              onPressed: ()async {
+                await controller.pickDocument();
+              },
               child: const Text("Upload"),
             ),
 
@@ -203,7 +201,7 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
 
             const SizedBox(height: 20),
 
-            if (_isLoading && _extractedText != null) ...[
+            if (_isLoading &&  controller.translatedText != null) ...[
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
@@ -216,7 +214,7 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
                   Text('Translating...', style: TextStyle(fontSize: 14)),
                 ],
               ),
-            ] else if (_translatedText != null) ...[
+            ] else if (controller.translatedText != null) ...[
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
@@ -225,7 +223,7 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  _translatedText!,
+              controller.translatedText??'',
                   style: const TextStyle(fontSize: 14),
                 ),
               ),
@@ -233,7 +231,7 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
 
             const SizedBox(height: 30),
 
-            /// Instruction box
+
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),

@@ -1,8 +1,6 @@
-import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'translation_service.dart'; // Import your service file
+import 'package:translation_app/controllers/camera_translator_controller.dart';
 
 class CameraTranslator extends StatefulWidget {
   const CameraTranslator({Key? key}) : super(key: key);
@@ -12,12 +10,14 @@ class CameraTranslator extends StatefulWidget {
 }
 
 class _CameraTranslatorState extends State<CameraTranslator> {
-  final ImagePicker _picker = ImagePicker();
-  File? _imageFile;
-  String _extractedText = '';
-  String _translatedText = '';
-  String? _selectedFromLang = 'auto';
-  String? _selectedToLang = 'en';
+  final controller = CameraTransaltionController();
+
+  // final ImagePicker _picker = ImagePicker();
+  // File? _imageFile;
+  // String _extractedText = '';
+  // String _translatedText = '';
+  // String? _selectedFromLang = 'auto';
+  // String? _selectedToLang = 'en';
 
   final Map<String, String> _languages = {
     'auto': 'Auto Detect',
@@ -36,57 +36,57 @@ class _CameraTranslatorState extends State<CameraTranslator> {
     'pt': 'Portuguese',
   };
 
-  Future<void> _pickImage() async {
-    try {
-      final XFile? photo = await _picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 80,
-      );
-      if (photo != null) {
-        setState(() {
-          _imageFile = File(photo.path);
-          _extractedText = '';
-          _translatedText = '';
-        });
-        await _extractTextFromImage(File(photo.path));
-      }
-    } catch (e) {
-      debugPrint('Error picking image: $e');
-    }
-  }
+  // Future<void> _pickImage() async {
+  //   try {
+  //     final XFile? photo = await _picker.pickImage(
+  //       source: ImageSource.camera,
+  //       imageQuality: 80,
+  //     );
+  //     if (photo != null) {
+  //       setState(() {
+  //         _imageFile = File(photo.path);
+  //         _extractedText = '';
+  //         _translatedText = '';
+  //       });
+  //       await _extractTextFromImage(File(photo.path));
+  //     }
+  //   } catch (e) {
+  //     debugPrint('Error picking image: $e');
+  //   }
+  // }
 
-  Future<void> _extractTextFromImage(File image) async {
-    final inputImage = InputImage.fromFile(image);
-    final textRecognizer = TextRecognizer();
-    final RecognizedText recognizedText =
-    await textRecognizer.processImage(inputImage);
+  // Future<void> _extractTextFromImage(File image) async {
+  //   final inputImage = InputImage.fromFile(image);
+  //   final textRecognizer = TextRecognizer();
+  //   final RecognizedText recognizedText =
+  //   await textRecognizer.processImage(inputImage);
+  //
+  //   await textRecognizer.close();
+  //
+  //   setState(() {
+  //     _extractedText = recognizedText.text;
+  //   });
+  //
+  //   if (_extractedText.isNotEmpty && _selectedToLang != null) {
+  //     await _translateText();
+  //   }
+  // }
 
-    await textRecognizer.close();
-
-    setState(() {
-      _extractedText = recognizedText.text;
-    });
-
-    if (_extractedText.isNotEmpty && _selectedToLang != null) {
-      await _translateText();
-    }
-  }
-
-  Future<void> _translateText() async {
-    try {
-      final translated = await TranslationService.translateText(
-        text: _extractedText,
-        from: _selectedFromLang == 'auto' ? null : _selectedFromLang,
-        to: _selectedToLang!,
-      );
-
-      setState(() {
-        _translatedText = translated;
-      });
-    } catch (e) {
-      debugPrint('Translation error: $e');
-    }
-  }
+  // Future<void> _translateText() async {
+  //   try {
+  //     final translated = await TranslationService.translateText(
+  //       text: _extractedText,
+  //       from: _selectedFromLang == 'auto' ? null : _selectedFromLang,
+  //       to: _selectedToLang!,
+  //     );
+  //
+  //     setState(() {
+  //       _translatedText = translated;
+  //     });
+  //   } catch (e) {
+  //     debugPrint('Translation error: $e');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +104,7 @@ class _CameraTranslatorState extends State<CameraTranslator> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _selectedFromLang,
+                      value: controller.selectedFromLang,
                       decoration: const InputDecoration(
                         labelText: 'From',
                         border: OutlineInputBorder(),
@@ -116,14 +116,14 @@ class _CameraTranslatorState extends State<CameraTranslator> {
                         );
                       }).toList(),
                       onChanged: (value) =>
-                          setState(() => _selectedFromLang = value),
+                          setState(() => controller.selectedFromLang = value),
                     ),
                   ),
                   const SizedBox(width: 20),
 
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _selectedToLang,
+                      value: controller.selectedToLang,
                       decoration: const InputDecoration(
                         labelText: 'To',
                         border: OutlineInputBorder(),
@@ -137,20 +137,20 @@ class _CameraTranslatorState extends State<CameraTranslator> {
                         );
                       }).toList(),
                       onChanged: (value) =>
-                          setState(() => _selectedToLang = value),
+                          setState(() => controller.selectedToLang = value),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
 
-              if (_imageFile != null)
+              if (controller.imageFile != null)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.file(
-                      _imageFile!,
+                      controller.imageFile!,
                       height: 200,
                       width: 300,
                       fit: BoxFit.cover,
@@ -161,7 +161,7 @@ class _CameraTranslatorState extends State<CameraTranslator> {
               const SizedBox(height: 10,),
 
               // Extracted Text Section
-              if (_extractedText.isNotEmpty) ...[
+              if (controller.extractedText.isNotEmpty) ...[
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   child: Text(
@@ -181,7 +181,7 @@ class _CameraTranslatorState extends State<CameraTranslator> {
                   ),
                   child: SingleChildScrollView(
                     child: Text(
-                      _extractedText,
+                 controller.extractedText,
                       maxLines: null,
                       overflow: TextOverflow.visible,
                       style: const TextStyle(fontSize: 14),
@@ -192,7 +192,7 @@ class _CameraTranslatorState extends State<CameraTranslator> {
               const SizedBox(height: 20),
 
 // Translated Text Section
-              if (_translatedText.isNotEmpty) ...[
+              if (controller.translatedText.isNotEmpty) ...[
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   child: Text(
@@ -214,7 +214,7 @@ class _CameraTranslatorState extends State<CameraTranslator> {
                     child: Container(
                       height: 300,
                       child: Text(
-                        _translatedText,
+                        controller.translatedText,
                         maxLines: null,
                         overflow: TextOverflow.visible,
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -232,7 +232,10 @@ class _CameraTranslatorState extends State<CameraTranslator> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _pickImage,
+        onPressed: ()async {
+          await controller.pickImage();
+
+        },
         child: const Icon(Icons.camera_alt),
       ),
     );

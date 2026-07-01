@@ -1,8 +1,8 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:translation_app/ai_translator_chat_service.dart';
-import 'package:translation_app/ai_dictionary_service.dart';
+import 'package:translation_app/services/ai_translator_chat_service.dart';
+import 'package:translation_app/services/ai_dictionary_service.dart';
 
 class DictionaryScreen extends StatefulWidget {
   const DictionaryScreen({Key? key}) : super(key: key);

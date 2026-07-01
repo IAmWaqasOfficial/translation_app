@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:translation_app/LanguageTranslatorHome.dart';
-import 'HomePage.dart';
+import 'package:translation_app/views/tabbarView.dart';
+import 'HomeView.dart';
 
 
 class WelcomeScreen extends StatelessWidget {
@@ -21,7 +21,7 @@ class WelcomeScreen extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Image.network(
-                    'https://i.pinimg.com/736x/78/6d/40/786d4067435d2c99785b2828bfe8f10d.jpg',
+                    'https://cdn.kastatic.org/ka-perseus-images/0721a7d56d72a710b610e278a5758ec117283e9c.png',
                     height: 150,
                   ),
                 ),

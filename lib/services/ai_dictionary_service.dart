@@ -15,7 +15,7 @@ class AiDictionaryService {
 
   /// 📚 Get definition, synonyms, and example for a given word
   static Future<Map<String, dynamic>> getWordData(String word) async {
-    // 🗣️ Prompt for the AI — we tell it EXACTLY how to respond
+
     final prompt = '''
 You are a dictionary assistant.
 Return ONLY a valid JSON object, no extra text, no markdown, no explanations.
@@ -54,7 +54,7 @@ Word: $word
       }),
     );
 
-    // ✅ If success, parse the response
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
 

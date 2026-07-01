@@ -74,17 +74,18 @@ import 'package:translation_app/AiTranslator.dart';
                                fontWeight: FontWeight.bold,
                              ),),
                            ),
+
                          ],
                        ),
                      ),
 
                      const SizedBox(width: 12),
 
-                     // Right side: Image
+
                      ClipRRect(
                        borderRadius: BorderRadius.circular(8),
                        child: Image.network(
-                         'https://i.pinimg.com/736x/78/6d/40/786d4067435d2c99785b2828bfe8f10d.jpg',
+                         'https://ehlion.com/wp-content/uploads/2019/04/THE-BEST-TRANSLATOR-APPS.jpg',
                          height: 80,
                          width: 80,
                          fit: BoxFit.cover,
