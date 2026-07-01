@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:translation_app/AiTranslator.dart';
-import 'package:translation_app/AiDictionary.dart';
+import 'package:translation_app/views/AiTranslatorView.dart';
+import 'package:translation_app/views/AiDictionaryView.dart';
 
 class MorePage extends StatelessWidget {
   @override
@@ -16,7 +16,7 @@ class MorePage extends StatelessWidget {
               title: 'Conversation',
               subtitle: 'Efficient communication in different languages',
               circleColor: Colors.red,
-              destination: DeepSeekChatScreen(), // Example destination
+              destination: DeepSeekChatView(),
             ),
             CustomCard(
               imageUrl:
@@ -25,7 +25,7 @@ class MorePage extends StatelessWidget {
               subtitle: 'Discover new difficult words and meanings',
               circleColor: Colors.blue,
               destination:DictionaryScreen() ,
-              // No destination here → won't be clickable
+
             ),
           ],
         ),
@@ -39,7 +39,7 @@ class CustomCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final Color circleColor;
-  final Widget? destination; // Optional navigation target
+  final Widget? destination;
 
   const CustomCard({
     Key? key,

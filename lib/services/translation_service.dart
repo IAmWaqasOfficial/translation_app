@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 class TranslationService {
   static Future<String> translateText({
     required String text,
-    String? from, // Optional: leave null to auto-detect
+    String? from,
     required String to,
   }) async {
     try {

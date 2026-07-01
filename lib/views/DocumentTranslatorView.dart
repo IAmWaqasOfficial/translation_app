@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'controllers/document_translator_controller.dart';
-
+import '../controllers/document_translator_controller.dart';
 
 class Documenttranslator extends StatefulWidget {
   const Documenttranslator({super.key});
@@ -11,19 +9,9 @@ class Documenttranslator extends StatefulWidget {
 }
 
 class _DocumenttranslatorState extends State<Documenttranslator> {
-
-
-
-  final controller=documentTranslatorController();
-
-
-
-
-
-
+  final controller = DocumentTranslatorController();
 
   bool _isLoading = false;
-
 
   final Map<String, String> _languages = {
     'auto': 'Auto Detect',
@@ -33,7 +21,6 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
     'ur': 'Urdu',
     'fr': 'French',
     'de': 'German',
-
     'ar': 'Arabic',
     'zh': 'Chinese',
     'ru': 'Russian',
@@ -42,108 +29,60 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
     'pt': 'Portuguese',
   };
 
-  // Future<bool> _requestPermission() async {
-  //   if (Platform.isAndroid) {
-  //     var storageStatus = await Permission.storage.status;
-  //     if (storageStatus.isGranted) return true;
-  //     storageStatus = await Permission.storage.request();
-  //     if (storageStatus.isGranted) return true;
-  //     var manageStorageStatus = await Permission.manageExternalStorage.status;
-  //     if (manageStorageStatus.isGranted) return true;
-  //     manageStorageStatus = await Permission.manageExternalStorage.request();
-  //     return manageStorageStatus.isGranted;
-  //   } else if (Platform.isIOS) {
-  //     return true;
-  //   }
-  //
-  //   return false;
-  // }
+  Future<void> _handleUpload() async {
+    setState(() {
+      _isLoading = true;
+    });
 
+    final status = await controller.pickDocument();
 
-  // Future<String> _extractTextFromFile(File file) async {
-  //   final bytes = await file.readAsBytes();
-  //   final PdfDocument document = PdfDocument(inputBytes: bytes);
-  //   final String text = PdfTextExtractor(document).extractText();
-  //   document.dispose();
-  //   return text;
-  // }
+    setState(() {
+      _isLoading = false;
+    });
 
-  // Future<void> _pickDocument() async {
-  //   bool permissionGranted = await _requestPermission();
-  //   if (!permissionGranted) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text('Storage permission is required to pick files.')),
-  //     );
-  //     return;
-  //   }
-  //
-  //   FilePickerResult? result = await FilePicker.platform.pickFiles(
-  //     type: FileType.custom,
-  //     allowedExtensions: ['pdf'],
-  //   );
-  //
-  //   if (result != null && result.files.isNotEmpty) {
-  //     final file = File(result.files.single.path!);
-  //
-  //     setState(() {
-  //       _pickedFileName = result.files.single.name;
-  //       _isLoading = true;
-  //       _translatedText = null;
-  //       _extractedText = null;
-  //     });
-  //
-  //     try {
-  //       final extracted = await _extractTextFromFile(file);
-  //
-  //       setState(() {
-  //         _extractedText = extracted;
-  //       });
-  //
-  //       final translated = await TranslationService.translateText(
-  //         text: extracted,
-  //         from: _selectedFromLang == 'auto' ? null : _selectedFromLang,
-  //         to: _selectedToLang!,
-  //       );
-  //
-  //       setState(() {
-  //         _translatedText = translated;
-  //       });
-  //     } catch (e) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Error: $e')),
-  //       );
-  //     } finally {
-  //       setState(() => _isLoading = false);
-  //     }
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text('No file selected.')),
-  //     );
-  //   }
-  // }
+    if (status == DocumentStatus.noFileSelected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No file selected")),
+      );
+    } else if (status == DocumentStatus.extractionFailed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to extract text from PDF")),
+      );
+    } else if (status == DocumentStatus.translationFailed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Translation failed")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey.shade200,
-        title: const Text('Document Translator',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Document Translator',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text('Select Document to Translate',
-                style: TextStyle(fontSize: 14)),
+            const Text(
+              'Select Document to Translate',
+              style: TextStyle(fontSize: 14),
+            ),
+
             const SizedBox(height: 20),
+
             Image.network(
               "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9Ie3QNexIRJ4bhs5UB2DrfuAGhuHFvH0qcA&s",
               height: 140,
             ),
-            const SizedBox(height: 20),
 
+            const SizedBox(height: 20),
 
             Row(
               children: [
@@ -160,8 +99,11 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
                         child: Text(entry.value),
                       );
                     }).toList(),
-                    onChanged: (value) =>
-                        setState(() => controller.selectedFromLang = value),
+                    onChanged: (value) {
+                      setState(() {
+                        controller.selectedFromLang = value;
+                      });
+                    },
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -173,15 +115,18 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
                       border: OutlineInputBorder(),
                     ),
                     items: _languages.entries
-                        .where((entry) => entry.key != 'auto')
+                        .where((e) => e.key != 'auto')
                         .map((entry) {
                       return DropdownMenuItem(
                         value: entry.key,
                         child: Text(entry.value),
                       );
                     }).toList(),
-                    onChanged: (value) =>
-                        setState(() => controller.selectedToLang = value),
+                    onChanged: (value) {
+                      setState(() {
+                        controller.selectedToLang = value;
+                      });
+                    },
                   ),
                 ),
               ],
@@ -190,18 +135,13 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
             const SizedBox(height: 20),
 
             ElevatedButton(
-              onPressed: ()async {
-                await controller.pickDocument();
-              },
+              onPressed: _isLoading ? null : _handleUpload,
               child: const Text("Upload"),
             ),
 
-
-
-
             const SizedBox(height: 20),
 
-            if (_isLoading &&  controller.translatedText != null) ...[
+            if (_isLoading) ...[
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
@@ -211,10 +151,12 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   ),
                   SizedBox(width: 10),
-                  Text('Translating...', style: TextStyle(fontSize: 14)),
+                  Text('Processing...', style: TextStyle(fontSize: 14)),
                 ],
               ),
-            ] else if (controller.translatedText != null) ...[
+            ]
+
+            else if (controller.translatedText != null) ...[
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
@@ -223,14 +165,13 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-              controller.translatedText??'',
+                  controller.translatedText!,
                   style: const TextStyle(fontSize: 14),
                 ),
               ),
             ],
 
             const SizedBox(height: 30),
-
 
             Container(
               width: double.infinity,
@@ -249,16 +190,19 @@ class _DocumenttranslatorState extends State<Documenttranslator> {
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Instructions to Upload Document:",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.blue)),
+                  Text(
+                    "Instructions to Upload Document:",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.blue,
+                    ),
+                  ),
                   SizedBox(height: 8),
                   Text("1. Click the 'Upload' button."),
-                  Text("2. Select the PDF document you want to translate."),
-                  Text("3. Choose source and destination languages."),
-                  Text("4. The original and translated text will be shown."),
+                  Text("2. Select the PDF document."),
+                  Text("3. Choose languages."),
+                  Text("4. Translation will appear below."),
                 ],
               ),
             ),

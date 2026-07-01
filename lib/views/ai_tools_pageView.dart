@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:translation_app/AiTranslator.dart';
+import 'package:translation_app/views/AiTranslatorView.dart';
 
 class AiToolsPage extends StatelessWidget {
   @override
@@ -16,7 +16,7 @@ class AiToolsPage extends StatelessWidget {
               description: 'Translate with AI into any language quickly and accurately.',
               imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSI_A5Wpa9ff7Ote5arkGDkrPs6PYo2HQigTQ&s',
               arrowColor: Colors.red,
-              destination: DeepSeekChatScreen(),
+              destination:DeepSeekChatView(),
               circleColor: Colors.green,
             ),
             FeatureCard(
@@ -84,7 +84,7 @@ class FeatureCard extends StatelessWidget {
           : null,
       child: Container(
         padding: const EdgeInsets.all(8),
-        margin: const EdgeInsets.symmetric(vertical: 8), // space between cards
+        margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -134,11 +134,11 @@ class FeatureCard extends StatelessWidget {
               ),
             ),
             CircleAvatar(
-              radius: 18, // size of the circle
+              radius: 18,
               backgroundColor: circleColor,
               child: Icon(
                 Icons.keyboard_arrow_right,
-                color: Colors.white, // icon color inside
+                color: Colors.white,
                 size: 22,
               ),
             )

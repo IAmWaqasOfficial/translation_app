@@ -17,7 +17,6 @@ class WelcomeScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // App Logo or Illustration
                 ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Image.network(
@@ -52,7 +51,6 @@ class WelcomeScreen extends StatelessWidget {
 
                 const SizedBox(height: 40),
 
-                // Get Started Button
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>LanguageTranslatorHome()));

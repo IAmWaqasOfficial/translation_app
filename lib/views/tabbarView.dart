@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:translation_app/HomePage.dart';
-import 'ai_tools_page.dart';
-import 'more_page.dart';
-import 'package:translation_app/settingsScreen.dart';
+import 'package:translation_app/views/HomeView.dart';
+import 'ai_tools_pageView.dart';
+import 'more_pageView.dart';
+import 'package:translation_app/views/settingsScreenView.dart';
 
 class LanguageTranslatorHome extends StatelessWidget {
   final List<Tab> myTabs = [

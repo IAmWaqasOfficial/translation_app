@@ -10,14 +10,8 @@ class CameraTranslator extends StatefulWidget {
 }
 
 class _CameraTranslatorState extends State<CameraTranslator> {
-  final controller = CameraTransaltionController();
+  final controller = CameraTranslationController();
 
-  // final ImagePicker _picker = ImagePicker();
-  // File? _imageFile;
-  // String _extractedText = '';
-  // String _translatedText = '';
-  // String? _selectedFromLang = 'auto';
-  // String? _selectedToLang = 'en';
 
   final Map<String, String> _languages = {
     'auto': 'Auto Detect',
@@ -36,57 +30,8 @@ class _CameraTranslatorState extends State<CameraTranslator> {
     'pt': 'Portuguese',
   };
 
-  // Future<void> _pickImage() async {
-  //   try {
-  //     final XFile? photo = await _picker.pickImage(
-  //       source: ImageSource.camera,
-  //       imageQuality: 80,
-  //     );
-  //     if (photo != null) {
-  //       setState(() {
-  //         _imageFile = File(photo.path);
-  //         _extractedText = '';
-  //         _translatedText = '';
-  //       });
-  //       await _extractTextFromImage(File(photo.path));
-  //     }
-  //   } catch (e) {
-  //     debugPrint('Error picking image: $e');
-  //   }
-  // }
 
-  // Future<void> _extractTextFromImage(File image) async {
-  //   final inputImage = InputImage.fromFile(image);
-  //   final textRecognizer = TextRecognizer();
-  //   final RecognizedText recognizedText =
-  //   await textRecognizer.processImage(inputImage);
-  //
-  //   await textRecognizer.close();
-  //
-  //   setState(() {
-  //     _extractedText = recognizedText.text;
-  //   });
-  //
-  //   if (_extractedText.isNotEmpty && _selectedToLang != null) {
-  //     await _translateText();
-  //   }
-  // }
 
-  // Future<void> _translateText() async {
-  //   try {
-  //     final translated = await TranslationService.translateText(
-  //       text: _extractedText,
-  //       from: _selectedFromLang == 'auto' ? null : _selectedFromLang,
-  //       to: _selectedToLang!,
-  //     );
-  //
-  //     setState(() {
-  //       _translatedText = translated;
-  //     });
-  //   } catch (e) {
-  //     debugPrint('Translation error: $e');
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +105,6 @@ class _CameraTranslatorState extends State<CameraTranslator> {
 
               const SizedBox(height: 10,),
 
-              // Extracted Text Section
               if (controller.extractedText.isNotEmpty) ...[
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -191,7 +135,6 @@ class _CameraTranslatorState extends State<CameraTranslator> {
               ],
               const SizedBox(height: 20),
 
-// Translated Text Section
               if (controller.translatedText.isNotEmpty) ...[
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),

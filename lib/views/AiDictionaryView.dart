@@ -1,8 +1,5 @@
-
-
 import 'package:flutter/material.dart';
-import 'package:translation_app/services/ai_translator_chat_service.dart';
-import 'package:translation_app/services/ai_dictionary_service.dart';
+import 'package:translation_app/controllers/ai_dic_controller.dart';
 
 class DictionaryScreen extends StatefulWidget {
   const DictionaryScreen({Key? key}) : super(key: key);
@@ -12,40 +9,8 @@ class DictionaryScreen extends StatefulWidget {
 }
 
 class _DictionaryScreenState extends State<DictionaryScreen> {
-  final TextEditingController _controller = TextEditingController();
-  bool isLoading = false;
-
-  String definition = '';
-  List<dynamic> synonyms = [];
-  String example = '';
-
-  Future<void> _searchWord() async {
-    final word = _controller.text.trim();
-    if (word.isEmpty) return;
-
-    setState(() {
-      isLoading = true;
-      definition = '';
-      synonyms = [];
-      example = '';
-    });
-
-    try {
-      final data = await AiDictionaryService.getWordData(word);
-
-      setState(() {
-        definition = data['definition'] ?? '';
-        synonyms = data['synonyms'] ?? [];
-        example = data['example'] ?? '';
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        definition = 'Error: $e';
-        isLoading = false;
-      });
-    }
-  }
+  final TextEditingController _Tcontroller = TextEditingController();
+  final AiDictionaryController controller = AiDictionaryController();
 
   @override
   Widget build(BuildContext context) {
@@ -58,12 +23,11 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Input field
             Row(
               children: [
                 Expanded(
                   child: TextField(
-                    controller: _controller,
+                    controller: _Tcontroller,
                     decoration: const InputDecoration(
                       labelText: 'Enter a word',
                       border: OutlineInputBorder(),
@@ -73,7 +37,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
-                  onPressed: isLoading ? null : _searchWord,
+                  onPressed: _searchWord,
                   child: const Text('Search'),
                 ),
               ],
@@ -81,108 +45,114 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
 
             const SizedBox(height: 20),
 
-            // Loading
-            if (isLoading) const CircularProgressIndicator(),
+            if (controller.isLoading) const CircularProgressIndicator(),
 
-            // Definition
-            if (!isLoading && definition.isNotEmpty) ...[
-              Card(
-                elevation: 3,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Definition
-                      Row(
+            const SizedBox(height: 20),
+
+            if (controller.definition.isNotEmpty)
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.menu_book, color: Colors.blue),
-                          const SizedBox(width: 8),
+                          _sectionHeader(
+                              icon: Icons.menu_book,
+                              color: Colors.blue,
+                              title: 'Definition'),
+                          const SizedBox(height: 6),
                           Text(
-                            'Definition',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.blue.shade700,
-                            ),
+                            controller.definition,
+                            style: const TextStyle(
+                                fontSize: 16, height: 1.4),
+                          ),
+                          const SizedBox(height: 16),
+
+                          _sectionHeader(
+                              icon: Icons.sync_alt,
+                              color: Colors.green,
+                              title: 'Synonyms'),
+                          const SizedBox(height: 6),
+                          controller.synonyms.isNotEmpty
+                              ? Wrap(
+                            spacing: 8,
+                            children: controller.synonyms
+                                .map((syn) => Chip(
+                              label: Text(
+                                syn,
+                                style:
+                                const TextStyle(fontSize: 14),
+                              ),
+                              backgroundColor:
+                              Colors.green.shade50,
+                            ))
+                                .toList(),
+                          )
+                              : const Text('No synonyms found.'),
+                          const SizedBox(height: 16),
+
+                          _sectionHeader(
+                              icon: Icons.lightbulb,
+                              color: Colors.orange,
+                              title: 'Example'),
+                          const SizedBox(height: 6),
+                          Text(
+                            controller.example,
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontStyle: FontStyle.italic,
+                                height: 1.4),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        definition,
-                        style: const TextStyle(fontSize: 16, height: 1.4),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Synonyms
-                      Row(
-                        children: [
-                          const Icon(Icons.sync_alt, color: Colors.green),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Synonyms',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.green.shade700,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      synonyms.isNotEmpty
-                          ? Wrap(
-                        spacing: 8,
-                        children: synonyms
-                            .map((syn) => Chip(
-                          label: Text(
-                            syn,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          backgroundColor: Colors.green.shade50,
-                        ))
-                            .toList(),
-                      )
-                          : const Text('No synonyms found.'),
-
-                      const SizedBox(height: 16),
-
-                      // Example
-                      Row(
-                        children: [
-                          const Icon(Icons.lightbulb, color: Colors.orange),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Example',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.orange.shade700,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        example,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontStyle: FontStyle.italic,
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ]
-
           ],
         ),
       ),
     );
+  }
+
+  Widget _sectionHeader(
+      {required IconData icon, required Color color, required String title}) {
+    return Row(
+      children: [
+        Icon(icon, color: color),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 18, ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _searchWord() async {
+    final word = _Tcontroller.text.trim();
+    if (word.isEmpty) return;
+
+    setState(() {
+      controller.isLoading = true;
+    });
+
+    try {
+      await controller.searchWord(word);
+    } catch (e) {
+      controller.definition = 'Error: $e';
+      controller.synonyms = [];
+      controller.example = '';
+    } finally {
+      setState(() {
+        controller.isLoading = false;
+      });
+    }
   }
 }

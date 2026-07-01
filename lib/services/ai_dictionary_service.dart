@@ -1,78 +1,40 @@
-// lib/services/ai_dictionary_service.dart
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:translation_app/models/dictionary_entry.dart';
 
-class AiDictionaryService {
+class GeminiService1 {
+  static Future<DictionaryEntry> getWordData(String word) async {
+    final url = Uri.parse("https://api.dictionaryapi.dev/api/v2/entries/en/$word");
 
-  static const String _apiKey = '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';
-
-
-  static const String _baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
-
-  // 🤖 Model name
-  static const String _model = 'deepseek/deepseek-chat-v3-0324:free';
-
-  /// 📚 Get definition, synonyms, and example for a given word
-  static Future<Map<String, dynamic>> getWordData(String word) async {
-
-    final prompt = '''
-You are a dictionary assistant.
-Return ONLY a valid JSON object, no extra text, no markdown, no explanations.
-The JSON must have exactly these keys:
-- definition (string)
-- synonyms (array of strings)
-- example (string)
-
-Example:
-{"definition": "A fruit that grows on apple trees.", "synonyms": ["fruit", "pome", "orchard fruit"], "example": "She ate a fresh apple from the garden."}
-
-Word: $word
-''';
-
-
-    // 📡 Send POST request to AI API
-    final response = await http.post(
-      Uri.parse(_baseUrl),
-      headers: {
-        'Authorization': 'Bearer $_apiKey',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        "model": _model,
-        "messages": [
-          {
-            "role": "system",
-            "content": "You are a helpful AI dictionary."
-          },
-          {
-            "role": "user",
-            "content": prompt
-          }
-        ],
-        "temperature": 0.2 // Lower temp = more consistent/accurate
-      }),
-    );
-
+    final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-
-      // Extract the AI's reply text
-      final content = data['choices'][0]['message']['content'];
-
       try {
-        // Second jsonDecode() turns string JSON → Dart Map
-        return jsonDecode(content);
+        final List<dynamic> data = jsonDecode(response.body);
+        if (data.isEmpty) throw Exception("No data found for the word '$word'");
+
+        final entry = data.first;
+        final meanings = entry['meanings'] as List<dynamic>;
+        if (meanings.isEmpty) throw Exception("No meanings found for the word '$word'");
+
+        final firstMeaning = meanings.first;
+        final definitions = firstMeaning['definitions'] as List<dynamic>;
+        if (definitions.isEmpty) throw Exception("No definitions found for the word '$word'");
+
+        final def = definitions.first;
+
+        return DictionaryEntry(
+          word: entry['word'] ?? '',
+          partOfSpeech: firstMeaning['partOfSpeech'] ?? "",
+          definition: def['definition'] ?? "",
+          example: def['example'] ?? "",
+          synonyms: (def['synonyms'] as List<dynamic>?)?.cast<String>() ?? [],
+        );
       } catch (e) {
-        return {
-          "definition": "Error: Could not parse AI response.",
-          "synonyms": [],
-          "example": ""
-        };
+        throw Exception("Failed to parse API response: $e");
       }
     } else {
-      throw Exception('API error: ${response.body}');
+      throw Exception("Word not found: ${response.body}");
     }
   }
 }
