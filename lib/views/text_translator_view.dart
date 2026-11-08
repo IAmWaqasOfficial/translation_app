@@ -44,7 +44,7 @@ class _TextTranslatorState extends State<TextTranslator> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
 
               Row(
                 children: [
