@@ -7,7 +7,7 @@ import 'package:translation_app/views/settingsScreenView.dart';
 class LanguageTranslatorHome extends StatelessWidget {
   final List<Tab> myTabs = [
     Tab(text: 'Translation'),
-    Tab(text: 'AI Tools'),
+    Tab(text: 'AII Tools'),
     Tab(text: 'More'),
   ];
 
